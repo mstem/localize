@@ -118,6 +118,12 @@ package needs no network and no dependencies. Regenerate after a tzdata release:
 npm run build-data
 ```
 
+Run that on **Node 24 or newer**. It needs `Intl.Locale.prototype.getTimeZones`,
+which Node 22 does not have, and the script refuses to run without it rather
+than emitting a table with the country corrections silently missing. The tests
+and the package itself run fine on Node 18 and up; this applies only to
+regenerating the data.
+
 Two decisions in there are worth knowing, because both are counterintuitive and
 both were bugs first:
 

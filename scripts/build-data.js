@@ -60,6 +60,19 @@ for (const [cc, , zone] of rows(zoneTab)) {
 // ICU lists zones zone.tab leaves out, and it places them geographically rather
 // than by clock. Only the reverse direction exists in the platform (region ->
 // zones), so every known region is asked and the answers inverted.
+//
+// This is a hard requirement, not a nicety. getTimeZones landed after Node 22,
+// and running this script without it would quietly emit a table missing the
+// corrections, putting Eritrea back in Kenya. Failing here is the only way that
+// stays visible.
+if (typeof Intl.Locale.prototype.getTimeZones !== 'function') {
+  throw new Error(
+    `Intl.Locale.prototype.getTimeZones is unavailable on ${process.version}. ` +
+      'Regenerate the data on Node 24 or newer: without it, zones that zone.tab ' +
+      'omits would be resolved through tzdb links, which answer with the country ' +
+      'of whatever zone shares their clock rather than where they are.'
+  );
+}
 const inZoneTab = new Set([...byCountry.values()].flat());
 const fromIcu = new Map();
 for (const cc of byCountry.keys()) {
